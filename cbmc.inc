@@ -14,7 +14,7 @@ run()
 
   gmon_suffix=$GMON_OUT_PREFIX
   export GMON_OUT_PREFIX="goto-cc_$gmon_suffix"
-  ./goto-cc --object-bits $OBJ_BITS --function $ENTRY "${BM[@]}" -o $LOG.bin
+  ./goto-cc --function $ENTRY "${BM[@]}" -o $LOG.bin
   if [ -n "$FAIL_FUNCTION" ]; then
     ./goto-instrument $LOG.bin $LOG.bin --remove-function-body "$FAIL_FUNCTION" \
                                         --generate-function-body "$FAIL_FUNCTION" \
@@ -29,7 +29,7 @@ ulimit -v 15000000 ; \
 EC=42 ; \
 for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
 echo "Unwind: $c" > $LOG.latest ; \
-for d in 1 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
+for d in 1 2 3 4 5 6 7 8 9 10 ; do \
 echo "Rounds: $d" > $LOG.latest ; \
 ./cbmc-binary --no-unwinding-assertions --no-standard-checks --lazy-c-seq-rounds $d --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
 ec=$? ; \
