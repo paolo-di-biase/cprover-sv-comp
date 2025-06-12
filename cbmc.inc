@@ -27,6 +27,7 @@ bash -c ' \
 ulimit -v 6000000 ; \
 \
 EC=42 ; \
+ec=42 ; \
 for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
 echo "Unwind: $c" > $LOG.latest ; \
 for d in 1 2 3 4 5 6 7 8 9 10 ; do \
