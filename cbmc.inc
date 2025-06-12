@@ -22,9 +22,9 @@ run()
   fi
 
   export GMON_OUT_PREFIX="cbmc_$gmon_suffix"
-timeout 875 bash -c ' \
+bash -c ' \
 \
-ulimit -v 15000000 ; \
+ulimit -v 6000000 ; \
 \
 EC=42 ; \
 for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
@@ -43,7 +43,7 @@ if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION FAILED$" ; then ec=1 ; fi ;
 fi ; \
 \
 case $ec in \
-0) EC=0 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok ; break ;; \
+0) EC=0 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok ;; \
 10) EC=10 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok ; break ;; \
 42) EC=42 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok ;; \
 *) if [ $EC -ne 0 ] ; then EC=$ec ; mv $LOG.latest $LOG.ok ; fi ; echo "EC=$EC" >> $LOG.ok ; break ;; \
