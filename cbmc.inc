@@ -29,6 +29,7 @@ ulimit -v 15000000 ; \
 EC=42 ; \
 for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
 echo "Unwind: $c" > $LOG.latest ; \
+echo "Rounds: 3 (Fixed)" >> $LOG.latest ; \
 echo "./cbmc-binary --lazy-c-seq-rounds 3 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
 ./cbmc-binary --lazy-c-seq-rounds 3 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
 ec=$? ; \
