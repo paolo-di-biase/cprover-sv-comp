@@ -50,6 +50,8 @@ case $ec in \
 esac ; \
 \
 done \
+\
+done \
 '
   if [ ! -s $LOG.ok ] ; then
     mv $LOG.latest $LOG.ok ; echo "EC=42" >> $LOG.ok
