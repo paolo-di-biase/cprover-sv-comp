@@ -29,7 +29,7 @@ ulimit -v 15000000 ; \
 EC=42 ; \
 for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
 echo "Unwind: $c" > $LOG.latest ; \
-for d in 1 2 3 4 5 6 7 8 8 10 ; do \
+for d in 1 2 3 4 5 6 7 8 9 10 ; do \
 echo "Rounds: $d" >> $LOG.latest ; \
 ./cbmc-binary --lazy-c-seq-rounds $d --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
 ec=$? ; \
