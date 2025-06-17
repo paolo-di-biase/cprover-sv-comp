@@ -31,10 +31,12 @@ for c in 2 6 12 17 21 40 200 400 1025 2049 268435456 ; do \
 echo "Unwind: $c" > $LOG.latest ; \
 for d in 1 2 3 4 5 6 7 8 9 10 ; do \
 echo "Rounds: $d" >> $LOG.latest ; \
+echo "./cbmc-binary --lazy-c-seq-rounds $d --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
 ./cbmc-binary --lazy-c-seq-rounds $d --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
 ec=$? ; \
 if [ $ec -eq 0 ] ; then \
 if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION SUCCESSFUL$" ; then ec=1 ; else \
+echo "./cbmc-binary --lazy-c-seq-rounds $d --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
 ./cbmc-binary --lazy-c-seq-rounds $d --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin > /dev/null 2>&1 || ec=42 ; \
 fi ; \
 fi ; \
