@@ -44,7 +44,7 @@ if [ $ec -eq 10 ] ; then \
 if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION FAILED$" ; then ec=1 ; fi ; \
 fi ; \
 if tail -n 10 $LOG.latest | grep -q "^VERIFICATION FAILED$" ; then break ; fi ; \
-done \
+done ; \
 \
 case $ec in \
 0) EC=0 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok ; break ;; \
