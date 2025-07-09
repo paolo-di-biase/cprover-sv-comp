@@ -53,7 +53,7 @@ case $ec in \
 esac ; \
 \
 done ; \
-if [ $EC -neq 10 ]; then \
+if [ $EC -ne 10 ]; then \
 for d in 2 3 4 5 6 7 8 9 10 ; do \
 echo "Unwind: $UNWIND" >> $LOG.latest ; \
 echo "Rounds: $d" >> $LOG.latest ; \
