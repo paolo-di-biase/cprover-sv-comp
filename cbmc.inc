@@ -34,8 +34,8 @@ echo "./cbmc-binary --no-unwinding-assertions --no-standard-checks --graphml-wit
 ec=$? ; \
 if [ $ec -eq 0 ] ; then \
 if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION SUCCESSFUL$" ; then ec=1 ; else \
-echo "./cbmc-binary --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
-./cbmc-binary --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin > /dev/null 2>&1 || ec=42 ; \
+echo "./cbmc-binary --unwinding-assertions --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
+./cbmc-binary --unwinding-assertions --slice-formula --no-standard-checks --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin > /dev/null 2>&1 || ec=42 ; \
 fi ; \
 fi ; \
 if [ $ec -eq 10 ] ; then \
