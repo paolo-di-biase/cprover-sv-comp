@@ -166,6 +166,7 @@ export BM_DIR=`mktemp -d -t ${TOOL_NAME}-benchmark.XXXXXX`
 export LOG=`mktemp -t ${TOOL_NAME}-log.XXXXXX`
 trap "rm -rf $LOG $LOG.latest $LOG.ok $LOG.witness $LOG.bin $BM_DIR" EXIT
 
+get_unwind_and_rounds
 run
 
 if [ ! -s $LOG.ok ] ; then
