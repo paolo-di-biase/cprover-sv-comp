@@ -55,22 +55,32 @@ esac ; \
 }
 
 get_unwind_and_rounds() {
-  local csv="output_unwind_rounds.csv"
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local csv="$SCRIPT_DIR/output_unwind_rounds.csv"
   local prop="$PROP"
   local bench="$(basename ${BM[0]})"
   bench="${bench%.i}"  # rimuove estensione .i se presente
   bench="${bench%.c}"  # rimuove anche .c se presente
 
-  # cerca la riga nel csv
+  if [ ! -f "$csv" ]; then
+    echo "⚠️  File CSV non trovato: $csv"
+    UNWIND_VAL=2
+    ROUNDS_VAL=1
+    return
+  fi
+
   local match_line=$(awk -F',' -v p="$prop" -v b="$bench" \
     '$1 == p && $2 == b {print $0}' "$csv")
 
   if [ -n "$match_line" ]; then
-    UNWIND_VAL=$(echo "$match_line" | cut -d',' -f3)
-    ROUNDS_VAL=$(echo "$match_line" | cut -d',' -f4)
+    local uw=$(echo "$match_line" | cut -d',' -f3)
+    local rd=$(echo "$match_line" | cut -d',' -f4)
+
+    UNWIND_VAL="${uw:-2}"
+    ROUNDS_VAL="${rd:-1}"
   else
-    echo "⚠️  Valori di unwind/rounds non trovati per $bench [$prop]"
-    UNWIND_VAL=2  # fallback di default
+    echo "⚠️  Riga non trovata nel CSV per $bench [$prop], uso default"
+    UNWIND_VAL=2
     ROUNDS_VAL=1
   fi
 }
