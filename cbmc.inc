@@ -55,9 +55,8 @@ esac ; \
 }
 
 get_unwind_and_rounds() {
-  ls
   local csv="output_unwind_rounds.csv"
-  local prop="$PROP"
+  local prop=$(normalize_property "$PROP")
   local bench="$(basename ${BM[0]})"
   bench="${bench%.i}"  # rimuove estensione .i se presente
   bench="${bench%.c}"  # rimuove anche .c se presente
@@ -69,8 +68,8 @@ get_unwind_and_rounds() {
     return
   fi
 
-  local match_line=$(awk -F',' -v p="$prop" -v b="$bench" '
-  tolower($1) ~ tolower(p) && $2 == b {print $0}' "$csv")
+  local match_line=$(awk -F',' -v p="$prop" -v b="$bench" \
+    '$1 == p && $2 == b {print $0}' "$csv")
 
   if [ -n "$match_line" ]; then
     local uw=$(echo "$match_line" | cut -d',' -f3)
@@ -83,4 +82,13 @@ get_unwind_and_rounds() {
     export UNWIND_VAL=2
     export ROUNDS_VAL=1
   fi
+}
+
+normalize_property() {
+  case "$1" in
+  overflow) echo "no-overflow" ;;
+  unreach_call) echo "unreach-call" ;;  # se ci sono più varianti
+  memsafety) echo "valid-memsafety" ;;
+  *) echo "$1" ;;  # default: nessuna modifica
+  esac
 }
