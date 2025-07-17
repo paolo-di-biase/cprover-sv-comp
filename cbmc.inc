@@ -55,6 +55,7 @@ esac ; \
 }
 
 get_unwind_and_rounds() {
+  ls
   local csv="output_unwind_rounds.csv"
   local prop="$PROP"
   local bench="$(basename ${BM[0]})"
