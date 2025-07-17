@@ -22,7 +22,7 @@ run()
   fi
 
   export GMON_OUT_PREFIX="cbmc_$gmon_suffix"
-timeout 3600 bash -c ' \
+timeout 10500 bash -c ' \
 \
 ulimit -v 15000000 ; \
 \
