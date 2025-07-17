@@ -52,6 +52,7 @@ esac ; \
 
   if [ "$EXIT_CODE" -eq 124 ]; then
     EC=42 ; mv $LOG.latest $LOG.ok ; echo "EC=$EC" >> $LOG.ok
+  fi
 
   if [ ! -s $LOG.ok ] ; then
     mv $LOG.latest $LOG.ok ; echo "EC=42" >> $LOG.ok
