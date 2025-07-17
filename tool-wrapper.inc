@@ -158,6 +158,8 @@ export BIT_WIDTH
 export BM
 export PROP
 export OBJ_BITS
+export UNWIND_VAL=2
+export ROUNDS_VAL=1
 
 export GMON_OUT_PREFIX=`basename ${BM[0]}`.gmon.out
 

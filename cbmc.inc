@@ -55,8 +55,7 @@ esac ; \
 }
 
 get_unwind_and_rounds() {
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  local csv="$SCRIPT_DIR/output_unwind_rounds.csv"
+  local csv="output_unwind_rounds.csv"
   local prop="$PROP"
   local bench="$(basename ${BM[0]})"
   bench="${bench%.i}"  # rimuove estensione .i se presente
@@ -64,23 +63,23 @@ get_unwind_and_rounds() {
 
   if [ ! -f "$csv" ]; then
     echo "⚠️  File CSV non trovato: $csv"
-    UNWIND_VAL=2
-    ROUNDS_VAL=1
+    export UNWIND_VAL=2
+    export ROUNDS_VAL=1
     return
   fi
 
-  local match_line=$(awk -F',' -v p="$prop" -v b="$bench" \
-    '$1 == p && $2 == b {print $0}' "$csv")
+  local match_line=$(awk -F',' -v p="$prop" -v b="$bench" '
+  tolower($1) ~ tolower(p) && $2 == b {print $0}' "$csv")
 
   if [ -n "$match_line" ]; then
     local uw=$(echo "$match_line" | cut -d',' -f3)
     local rd=$(echo "$match_line" | cut -d',' -f4)
 
-    UNWIND_VAL="${uw:-2}"
-    ROUNDS_VAL="${rd:-1}"
+    export UNWIND_VAL="${uw:-2}"
+    export ROUNDS_VAL="${rd:-1}"
   else
     echo "⚠️  Riga non trovata nel CSV per $bench [$prop], uso default"
-    UNWIND_VAL=2
-    ROUNDS_VAL=1
+    export UNWIND_VAL=2
+    export ROUNDS_VAL=1
   fi
 }
