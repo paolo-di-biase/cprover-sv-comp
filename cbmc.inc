@@ -28,9 +28,8 @@ ulimit -v 15000000 ; \
 \
 EC=42 ; \
 echo "Unwind: $UNWIND_VAL" > $LOG.latest ; \
-echo "Rounds: $ROUNDS_VAL" >> $LOG.latest ; \
-echo "./cbmc-binary --lazy-c-seq-rounds $ROUNDS_VAL --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
-./cbmc-binary --lazy-c-seq-rounds $ROUNDS_VAL --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
+echo "./cbmc-binary --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
+./cbmc-binary --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
 ec=$? ; \
 if [ $ec -eq 0 ] ; then \
 if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION SUCCESSFUL$" ; then ec=1 ; \
@@ -64,7 +63,6 @@ get_unwind_and_rounds() {
   if [ ! -f "$csv" ]; then
     echo "⚠️  File CSV non trovato: $csv"
     export UNWIND_VAL=2
-    export ROUNDS_VAL=1
     return
   fi
 
@@ -73,14 +71,11 @@ get_unwind_and_rounds() {
 
   if [ -n "$match_line" ]; then
     local uw=$(echo "$match_line" | cut -d',' -f3)
-    local rd=$(echo "$match_line" | cut -d',' -f4)
 
     export UNWIND_VAL="${uw:-2}"
-    export ROUNDS_VAL="${rd:-1}"
   else
     echo "⚠️  Riga non trovata nel CSV per $bench [$prop], uso default"
     export UNWIND_VAL=2
-    export ROUNDS_VAL=1
   fi
 }
 
