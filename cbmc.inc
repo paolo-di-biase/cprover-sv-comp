@@ -49,8 +49,8 @@ case $ec in \
 *) if [ $EC -ne 0 ] ; then EC=$ec ; mv $LOG.latest $LOG.ok ; fi ; echo "EC=$EC" >> $LOG.ok ; break ;; \
 esac ; \
 done ; \
+ec=$EC ; \
 if [ $ec -eq 0 ] ; then \
-if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION SUCCESSFUL$" ; then ec=1 ; \
 echo "./cbmc-binary --lazy-c-seq-rounds $d --verbosity 8 --unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
 ./cbmc-binary --lazy-c-seq-rounds $d --verbosity 8 --unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $c --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 || ec=42 ; \
 fi ; \
