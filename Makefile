@@ -43,6 +43,8 @@ cbmc.zip: cbmc.inc tool-wrapper.inc $(CBMC)/LICENSE $(CBMC)/cmake-build-debug/bi
 	$(MAKE) cbmc-wrapper
 	mv cbmc-wrapper $(basename $@)/cbmc
 	cp output_unwind_rounds.csv $(basename $@)/output_unwind_rounds.csv
+	cp pthreadtypes.h $(basename $@)/pthreadtypes.h
+	cp pthread.h $(basename $@)/pthread.h
 	./sv-comp-readme.sh $(basename $@) > $(basename $@)/README
 	cp -L $(CBMC)/LICENSE $(basename $@)/
 	cp -L $(CBMC)/cmake-build-debug/bin/cbmc $(basename $@)/cbmc-binary
