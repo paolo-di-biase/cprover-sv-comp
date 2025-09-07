@@ -14,8 +14,8 @@ run()
 
   gmon_suffix=$GMON_OUT_PREFIX
   export GMON_OUT_PREFIX="goto-cc_$gmon_suffix"
-  preprocess_i "${BM[@]}" "${BM[@]}"
-  ./goto-cc --function $ENTRY "${BM[@]}" -o $LOG.bin
+  preprocess_i "${BM[@]}" "$LOG.i"
+  ./goto-cc --function $ENTRY "$LOG.i" -o $LOG.bin
   if [ -n "$FAIL_FUNCTION" ]; then
     ./goto-instrument $LOG.bin $LOG.bin --remove-function-body "$FAIL_FUNCTION" \
                                         --generate-function-body "$FAIL_FUNCTION" \
