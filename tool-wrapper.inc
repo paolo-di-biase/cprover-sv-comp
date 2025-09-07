@@ -169,6 +169,7 @@ export LOG=`mktemp -t ${TOOL_NAME}-log.XXXXXX`
 trap "rm -rf $LOG $LOG.latest $LOG.ok $LOG.witness $LOG.bin $BM_DIR" EXIT
 
 get_unwind_and_rounds
+preprocess_i
 run
 
 if [ ! -s $LOG.ok ] ; then

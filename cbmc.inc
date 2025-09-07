@@ -14,7 +14,8 @@ run()
 
   gmon_suffix=$GMON_OUT_PREFIX
   export GMON_OUT_PREFIX="goto-cc_$gmon_suffix"
-  ./goto-cc --function $ENTRY "${BM[@]}" -o $LOG.bin
+  preprocess_i "${BM[0]}" "$LOG.prepared.i"
+  ./goto-cc --function $ENTRY "$LOG.prepared.i" -o $LOG.bin
   if [ -n "$FAIL_FUNCTION" ]; then
     ./goto-instrument $LOG.bin $LOG.bin --remove-function-body "$FAIL_FUNCTION" \
                                         --generate-function-body "$FAIL_FUNCTION" \
@@ -97,4 +98,23 @@ normalize_property() {
   memsafety) echo "valid-memsafety" ;;
   *) echo "$1" ;;  # default: nessuna modifica
   esac
+}
+
+preprocess_i() {
+  local infile="$1"
+  local outfile="$2"
+  local intermediate="intermediate.c"
+
+  local block=$(tac "$infile" | sed -n '/^$/q; p' | tac)
+
+    {
+      echo '#include <pthread.h>'
+      echo '#include <assert.h>'
+      echo '#include <stdio.h>'
+      echo
+      echo "$block"
+    } > "$intermediate"
+  }
+
+  gcc -I pthreadtypes.h -I pthread.h -E "$intermediate" -o "$outfile"
 }
