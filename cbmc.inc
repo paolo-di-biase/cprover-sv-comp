@@ -105,17 +105,15 @@ preprocess_i() {
   local outfile="$2"
   local intermediate="intermediate.c"
 
-  local block=$(tac "$infile" | sed -n '/^$/q; p' | tac)
-
-  block=$(echo "$block" | sed 's/{{[[:space:]]*0,[[:space:]]*0,[[:space:]]*0,[[:space:]]*PTHREAD_MUTEX_TIMED_NP,[[:space:]]*0,[[:space:]]*{{[[:space:]]*0,[[:space:]]*0[[:space:]]*}}[[:space:]]*}}/PTHREAD_MUTEX_INITIALIZER/g')
-
-    {
-      echo '#include <pthread.h>'
-      echo '#include <assert.h>'
-      echo '#include <stdio.h>'
-      echo
-      echo "$block"
-    } > "$intermediate"
+  perl -0777 -e ' \
+    local $/ = undef; \
+    my $s = <>; \
+    my @parts = split(/\r?\n\s*\r?\n/, $s);  \
+    while (@parts && $parts[-1] =~ /^\s*$/) { pop @parts } \
+    my $block = $parts[-1] // ""; \
+    $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*;/= PTHREAD_MUTEX_INITIALIZER;/g; \
+    print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n", $block, "\n"; \
+  ' "$infile" > "$intermediate"
 
   gcc -I pthread -E "$intermediate" -o "$outfile"
 }
