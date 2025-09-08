@@ -107,6 +107,8 @@ preprocess_i() {
 
   local block=$(tac "$infile" | sed -n '/^$/q; p' | tac)
 
+  block=$(echo "$block" | sed 's/{{[[:space:]]*0,[[:space:]]*0,[[:space:]]*0,[[:space:]]*PTHREAD_MUTEX_TIMED_NP,[[:space:]]*0,[[:space:]]*{{[[:space:]]*0,[[:space:]]*0[[:space:]]*}}[[:space:]]*}}/PTHREAD_MUTEX_INITIALIZER/g')
+
     {
       echo '#include <pthread.h>'
       echo '#include <assert.h>'
