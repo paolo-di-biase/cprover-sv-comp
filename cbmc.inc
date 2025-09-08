@@ -105,14 +105,14 @@ preprocess_i() {
   local outfile="$2"
   local intermediate="intermediate.c"
 
-  perl -0777 -e ' \
-    local $/ = undef; \
-    my $s = <>; \
-    my @parts = split(/\r?\n\s*\r?\n/, $s);  \
-    while (@parts && $parts[-1] =~ /^\s*$/) { pop @parts } \
-    my $block = $parts[-1] // ""; \
-    $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*;/= PTHREAD_MUTEX_INITIALIZER;/g; \
-    print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n", $block, "\n"; \
+  perl -0777 -e '
+    local $/ = undef;
+    my $s = <>;
+    my @parts = split(/\r?\n\s*\r?\n/, $s);
+    while (@parts && $parts[-1] =~ /^\s*$/) { pop @parts }
+    my $block = $parts[-1] // "";
+    $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*;/= PTHREAD_MUTEX_INITIALIZER;/g;
+    print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n", $block, "\n";
   ' "$infile" > "$intermediate"
 
   gcc -I pthread -E "$intermediate" -o "$outfile"
