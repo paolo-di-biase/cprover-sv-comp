@@ -14,8 +14,12 @@ run()
 
   gmon_suffix=$GMON_OUT_PREFIX
   export GMON_OUT_PREFIX="goto-cc_$gmon_suffix"
-  preprocess_i "${BM[@]}" "$LOG.i"
-  ./goto-cc --function $ENTRY "$LOG.i" -o $LOG.bin
+  if [[ "${BM[@]}" == *.i ]]; then
+    preprocess_i "${BM[@]}" "$LOG.i"
+    ./goto-cc --function $ENTRY "$LOG.i" -o $LOG.bin
+  else
+    ./goto-cc --function $ENTRY "${BM[@]}" -o $LOG.bin
+  fi
   if [ -n "$FAIL_FUNCTION" ]; then
     ./goto-instrument $LOG.bin $LOG.bin --remove-function-body "$FAIL_FUNCTION" \
                                         --generate-function-body "$FAIL_FUNCTION" \
@@ -104,16 +108,62 @@ preprocess_i() {
   local infile="$1"
   local outfile="$2"
   local intermediate="intermediate.c"
+  local error=0
 
-  perl -0777 -e '
-    local $/ = undef;
-    my $s = <>;
-    my @parts = split(/\r?\n\s*\r?\n/, $s);
-    while (@parts && $parts[-1] =~ /^\s*$/) { pop @parts }
-    my $block = $parts[-1] // "";
-    $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*;/= PTHREAD_MUTEX_INITIALIZER;/g;
-    print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n", $block, "\n";
-  ' "$infile" > "$intermediate"
+   for i in 1 2; do
+     error=0
+    perl -0777 -e '
+      local $/ = undef;
+  my $n = shift @ARGV;      # numero di blocchi da prendere
+  my $file = shift @ARGV;   # file di input
 
-  gcc -I pthread -E "$intermediate" -o "$outfile"
+  open my $fh, "<", $file or die "Cannot open $file: $!";
+  my $s = do { local $/; <$fh> };
+  close $fh;
+
+  my @parts = split(/\r?\n\s*\r?\n/, $s);
+  while (@parts && $parts[$#parts] =~ /^\s*$/) { pop @parts }
+  my $total = scalar @parts;
+
+  if ($n > $total) { $n = $total; }
+
+  my @sel = splice(@parts, -$n);
+  my $block = join("\n\n", @sel);
+
+  $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*/= PTHREAD_MUTEX_INITIALIZER/g;
+  $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*/= PTHREAD_MUTEX_INITIALIZER/g;
+
+  print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n",$block,"\n";
+
+  warn "TOTAL_BLOCKS=$total\n";
+' "$i" "$infile" > "$intermediate" 2> perl_meta.log
+
+total_blocks=$(grep "TOTAL_BLOCKS=" perl_meta.log | cut -d= -f2)
+
+if [[ $i -ge $total_blocks ]]; then
+error=1
+  break
+fi
+
+if grep -q "pthread_mutex_t" "$intermediate"; then
+echo "si mutex"
+gcc -I pthread -E "$intermediate" -o "$outfile" || error=1
+if [[ $error -eq 0 ]]; then
+break
+fi
+else
+echo "no mutex"
+if gcc -E "$intermediate" -o /dev/null; then
+  error=1
+  break
+else
+error=1
+fi
+fi
+
+done
+
+if [[ $error -eq 1 ]]; then
+cp "$infile" "$outfile"
+fi
 }
