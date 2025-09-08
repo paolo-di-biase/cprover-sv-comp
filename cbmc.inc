@@ -110,7 +110,7 @@ preprocess_i() {
   local intermediate="intermediate.c"
   local error=0
 
-   for i in 1 2; do
+   for i in 1 2 3; do
      error=0
     perl -0777 -e '
       local $/ = undef;
