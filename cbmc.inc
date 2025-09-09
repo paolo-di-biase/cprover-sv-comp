@@ -133,7 +133,17 @@ preprocess_i() {
   $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*PTHREAD_MUTEX_TIMED_NP\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*/= PTHREAD_MUTEX_INITIALIZER/g;
   $block =~ s/=\s*\{\s*\{\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*,\s*\{\s*\{\s*0\s*,\s*0\s*\}\s*\}\s*\}\s*\}\s*/= PTHREAD_MUTEX_INITIALIZER/g;
 
-  print "#include <pthread.h>\n#include <assert.h>\n#include <stdio.h>\n\n",$block,"\n";
+  print "#include <pthread.h>\n" unless $block =~ /#include\s+<pthread\.h>/;
+  print "#include <assert.h>\n"  unless $block =~ /#include\s+<assert\.h>/;
+  print "#include <stdio.h>\n"   unless $block =~ /#include\s+<stdio\.h>/;
+  print "extern void abort(void);\n" unless $block =~ /\bextern\s+void\s+abort\s*\(\s*void\s*\)/;
+  print "void assume_abort_if_not(int cond) { if(!cond) {abort();}}\n" unless $block =~ /\bvoid\s+assume_abort_if_not\s*\(\s*int\s+cond\s*\)/;
+  print "void reach_error() { assert(0); }\n" unless $block =~ /\bvoid\s+reach_error\s*\(\s*\)/;
+  print "void __VERIFIER_assert(int cond) { if (!(cond)) { ERROR: {reach_error();abort();} } return; }\n" unless $block =~ /\bvoid\s+__VERIFIER_assert\s*\(\s*int\s+cond\s*\)/;
+  print "extern void __VERIFIER_atomic_begin(void);\n"   unless $block =~ /\bextern\s+void\s+__VERIFIER_atomic_begin\s*\(\s*void\s*\)/;
+  print "extern void __VERIFIER_atomic_end(void);\n" unless $block =~ /\bextern\s+void\s+__VERIFIER_atomic_end\s*\(\s*void\s*\)/;
+  print "extern int __VERIFIER_nondet_int();\n" unless $block =~ /\bextern\s+int\s+__VERIFIER_nondet_int\s*\(\s*\)/;
+  print "\n\n", $block, "\n";
 
   warn "TOTAL_BLOCKS=$total\n";
 ' "$i" "$infile" > "$intermediate" 2> perl_meta.log
