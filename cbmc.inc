@@ -177,7 +177,7 @@ if [[ $error -eq 1 ]]; then
 cp "$infile" "$outfile"
 fi
 
-if [[ "$infile" == *"28-race_reach_86-lists_racing-deref.i"* || "$infile" == *"28-race_reach_87-lists_racefree-deref.i"* || "$infile" == *"28-race_reach_92-evilcollapse_racing-deref.i"* ]]; then
+if [[ "$infile" == *"28-race_reach_86-lists_racing-deref.i"* || "$infile" == *"28-race_reach_87-lists_racefree-deref.i"* || "$infile" == *"28-race_reach_92-evilcollapse_racing-deref.i"* || "$infile" == *"bounded_buffer.i"* ]]; then
   cp "$infile" "$outfile"
 fi
 }
