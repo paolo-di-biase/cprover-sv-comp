@@ -27,10 +27,12 @@ timeout 86400 bash -c ' \
 ulimit -v 100000000 ; \
 \
 EC=42 ; \
-echo "Unwind: $UNWIND_VAL" > $LOG.latest ; \
-echo "Rounds: $ROUNDS_VAL" >> $LOG.latest ; \
-echo "./cbmc-binary --lazy-c-seq-rounds $ROUNDS_VAL --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin" >> $LOG.latest ; \
-./cbmc-binary --lazy-c-seq-rounds $ROUNDS_VAL --verbosity 8 --no-unwinding-assertions --no-standard-checks --graphml-witness $LOG.witness --slice-formula --unwind $UNWIND_VAL --stop-on-fail --object-bits $OBJ_BITS $PROPERTY $LOG.bin >> $LOG.latest 2>&1 ; \
+case "${BM[@]}" in  \
+"SafeStack_seqcst_forCSEQ_static.c") echo "SafeStack_seqcst_forCSEQ_static" >> $LOG.latest ; timeout 6h ./cbmc-binary --ILP32 --unwind 3 --lazy-c-seq-rounds 4 --no-unwinding-assertions --verbosity 8 --graphml-witness $LOG.witness --stop-on-fail --object-bits $OBJ_BITS $LOG.bin >> $LOG.latest 2>&1 ;; \
+"elimination-backoff-stack.c") echo "elimination-backoff-stack" >> $LOG.latest ; timeout 6h ./cbmc-binary --ILP32 --unwind 1 --lazy-c-seq-rounds 2 --no-unwinding-assertions --verbosity 8 --graphml-witness $LOG.witness --stop-on-fail --object-bits $OBJ_BITS $LOG.bin >> $LOG.latest 2>&1 ;; \
+"dcas_8_unrman.c") echo "dcas_8_unrman" >> $LOG.latest ; timeout 6h ./cbmc-binary --ILP32 --unwind 1 --lazy-c-seq-rounds 2 --no-unwinding-assertions --verbosity 8 --graphml-witness $LOG.witness --stop-on-fail --object-bits $OBJ_BITS $LOG.bin >> $LOG.latest 2>&1 ;; \
+*) echo "input non riconosciuto ${BM[@]}" >> $LOG.latest ; exit ;; \
+esac ; \
 ec=$? ; \
 if [ $ec -eq 0 ] ; then \
 if ! tail -n 10 $LOG.latest | grep -q "^VERIFICATION SUCCESSFUL$" ; then ec=1 ; \
